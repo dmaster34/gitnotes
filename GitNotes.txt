@@ -1,0 +1,220 @@
+
+git reset --soft sha
+git log
+git status    //didnt change the staging are and the working directory
+git reset --soft 5c86ebd1    //we can still go back to the most recent so it changes only the HEAD pointer
+git log
+git status
+
+git reset --mixed da38660bbcd206
+git status //working dir not changed but the staging area is empty
+git diff   // we can see our changes we can stage them etc 
+git reset --mixed 5c86ebd1  //we can still go forward
+
+git reset --hard da38660bbcd206
+git log
+git status   //our changes are lost
+git reset --hard 5c86ebd1 // but we can still go forward
+
+get rid of file from the working directory
+git status
+git clean -n // test run
+git clean -f // will throw away the working dir but not the staging area
+git reset HEAD junk1.txt
+git clean -f
+git status   //junk1.txt were staged but now staged changes are thrown away
+
+ignoring file
+project/.gitignore
+very basic regexp  * ? [ aeiou ] [0-9]  negate expressions with !
+for example
+*.php   //all php won't be tracked
+!index.php  //but index.php will be tracked
+assets/video/   //skip everything in this dir if it end with /
+in the .gitignore  comment lines with #, blank lines are skipped
+so just create the .gitignore in the project lib
+it also should be commented into the project
+another example:
+tempfile.txt
+.DS_Store
+*.zip
+*.gz
+log/*.log
+log/*.log.[0-9]
+assets/photoshop/
+assets/videos/
+!assets/videos/tour_*.mp4
+
+what to ignore:
+-compiled source code
+-packages and compressed files
+-log and databases
+-operating system generated file
+-user-uploaded assets images pdfs videos
+
+ingore files in all repository:
+user-specific instead of repository-specific
+git config --global core.excludesfie /Users/kisstib/.gitignore_global
+in the .gitconfig there will be a excludesfile =  /Users/kisstib/.gitignore_global
+
+ignoring tracked files (files which are already in the repo)
+add file to the .gitingnore //but this is not enough
+-git rm --cached tempfile2.txt
+
+tracking empty directories  //get keeps files not directories
+it can't be empty touch assets/pdfs/.gitkeep
+so just put a little tiny file into it and add, commit it
+
+how to refer to commits:
+git ls-tree HEAD //list the file at that point
+git ls-tree master assets/
+blob file
+tree directory
+git log //see the commits
+git log --online //one list of the logs
+git log --online -5 //shows only 5 commits
+git log --since=\'932012-12-01\'94  2 weeks ago, 3 days ago 3.days 2.weeks
+--until
+--before 
+--author="Kevin"
+git log --grep="temp"
+git log sha1..shax --oneline
+git log tax.. index.html // what happened with this file prev
+git log -p tax.. index.html // shows the changes too
+git log --stat --summary  //tells statistic about the changes
+git log --format=oneline  //show the full ha
+git log --graph  //shows graph
+git log --oneline --graph --all --decorate
+
+looking the commit
+git log --oneline
+git show sha //shows info and diff
+
+git ls-tree master
+git show sha of a tree // shows the dirs inside
+git show sha of a file //shows the file content
+
+compare commits 2 different commits
+git diff --staged or --cached
+git log --oneline
+git diff shax //all the diff between the curr dir and that commit
+git diff shax tours.html //diff file in that commit
+git diff sha1..sha2 //between two commits
+git diff shal..sha2 //between commits in that file
+git diff --stat --summary shax..HEAD // nice summary about the changes
+git diff --ignore--all-space shax..HEAD
+
+branches
+try new ideas
+
+git branch //show the branches what we have
+git branch new_feature  //create a new branch with new_feature name
+git branch // the one with the * shows the actually checked out branch
+git checkout new_feature //checks out the new feature branch so switch to it
+git checkout -b shorten_title //creates new branch and checks out it
+git checkout -- file  //checks out the file in the current branch this is the 2nd role of checkout
+
+the working dir have to be mostly clean to do the switch
+git status //we have unsaved changes
+git checkout master //error message: commit your change or stash them
+
+git branch
+git diff master..new_feature //compares two branches with ..
+git diff --color-words new_feature..master //shows the different words
+
+//will shows us all braches that are completely included in this branch
+git branch --merged
+
+git branch -m new_feature seo_title   //or
+git branch --move new_feature seo_title  //renames the branch
+
+git branch branch_to_delete
+git branch -d branch_to_delete  //or
+git branch --delete branch_to_delete //deletes the branch
+//we have to be in another branch to delete a branch
+//the -D option has to be used if the branch is not fully merged
+git branch -D branch_to_delete
+
+//command prompt to show which branch is checked out
+__git_ps1  //what we want to use
+export PS1=\'91$(__git_ps1 \'93(%s)\'94) > '  //but it is active in the window only
+//so put this into .bash_profile
+//on windows:
+echo $PS1
+__git_ps1
+//create a .bash_profie into the user directory with content
+export PS1=\'91\\w$(__git_ps1 \'93(%s)\'94) > '
+//restart the window or run: source ~/.bash_profile
+
+//merge change from seo_title into the master branc
+git diff master..seo_title //see the changes
+//1 check out the branch which will receive the changes:
+git checkout master
+//2 merge
+git merge seo_title
+//we can check the result
+git diff master..seo_title  //no diff
+git branch --merged //seo_title is merged into master
+
+//fast forward merge: the master don't have any changes,
+//so just add the new commits at the top of the master and point the
+//head into the last
+git merge --no--ff branch  //makes a merge commit anyway pl docu
+git merge --ff--only //do the merge only if you can do fast forward merge
+//real merge //if branches has only the same ancestor, but both have changes
+
+//a conflict occurs when there're two changes to the same line or set of lines in two different commits
+revolving merge conficts:
+we are in the middle of the merge:
+-abort merge  git merge --abort
+-resolve the conflicts manually  edit the docu check if you are satisfied with it and add and commit the result
+git commit
+-use a merge tool
+git log --graph --oneline --all --decorate
+
+merge strategies
+-keep lines short
+-keep commits small and focused
+-beware stray edits to whitespace spaces tabs line return
+-merge often
+-track changes to master: 
+as changes continue to happen in master, keep bringing those changes into your branch so that your branch stays mostly in sync with master
+
+stash storing file temporarily
+//don't have sha
+git stash save "changed mission page title"  //stashes the files in workingdir
+
+
+/available in all branches
+
+//view stashed changes
+git stash list 
+git stash show stash@{0}
+//see more info use the -p option\
+git stash show -p 
+stash@{0}
+//get stashed changes into working directory\
+git stash pop stash@{0} //pulls out and removes it from the stash
+git stash apply stash@{0} //pulls it from the stash but keeps it in the stash too
+//delete shash
+git stash drop stash@{0}
+git stash clear //clears out all of the stashes
+
+remotes
+push  //push our changes into a remote server in my computer there is a origin/master which we try to keep in sync with the remote
+fetch //fetches the remote changes into our origin/master
+//than we do a merge to make sync our master with origin/master
+
+git remote //list the remotes
+git remote add alias url  // alias how to name it
+git remote add origin https://github.com/dmaster34/gitnotes.git
+git remote -v   //shows the fetch and push links
+git remote rm origin // removes the remote\
+
+cat .git/config    //check it
+
+git push -u remote branchname
+git branch -r // shows the remote branches
+git branch -a //shows all branches
+
+git clone https://github.com/dmaster34/gitnotes.git //clones the repo and creates the directory
